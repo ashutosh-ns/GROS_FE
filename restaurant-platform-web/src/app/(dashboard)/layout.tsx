@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/stores/auth-store';
+import { NotificationBell } from '@/components/dashboard/notification-bell';
 
 const navItems = [
   { label: 'Overview', href: '/dashboard/overview', icon: '📊' },
@@ -71,6 +72,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main content */}
       <main className="flex-1 overflow-auto">
+        <div className="flex items-center justify-end border-b px-6 py-2 md:hidden">
+          <NotificationBell />
+        </div>
+        <div className="hidden items-center justify-end border-b px-6 py-2 md:flex">
+          <NotificationBell />
+        </div>
         <div className="p-6">{children}</div>
       </main>
     </div>

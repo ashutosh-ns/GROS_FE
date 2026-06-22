@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { EventsGateway } from '../../websockets/events.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/orders.dto';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class OrdersService {
     private prisma: PrismaService,
     private redis: RedisService,
     private eventsGateway: EventsGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createFromSession(sessionToken: string, dto: CreateOrderDto) {
@@ -146,6 +148,14 @@ export class OrdersService {
     });
 
     this.eventsGateway.emitNewOrder(restaurantId, order);
+
+    this.notificationsService.create({
+      restaurantId,
+      title: `New Order #${orderNumber}`,
+      body: `Table ${order.table.number} placed an order (₹${total.toFixed(0)})`,
+      type: 'order:new',
+      data: { orderId: order.id, tableNumber: order.table.number },
+    });
 
     return order;
   }

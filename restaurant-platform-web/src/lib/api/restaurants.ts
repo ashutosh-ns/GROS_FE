@@ -77,4 +77,30 @@ export const restaurantsApi = {
 
   updateOrderStatus: (restaurantId: string, orderId: string, status: string, cancelReason?: string) =>
     apiClient.patch(`/restaurants/${restaurantId}/orders/${orderId}/status`, { status, cancelReason }),
+
+  // Analytics
+  getRevenueAnalytics: (restaurantId: string, params?: Record<string, string>) =>
+    apiClient.get(`/restaurants/${restaurantId}/analytics/revenue`, { params }),
+
+  getOrderAnalytics: (restaurantId: string, params?: Record<string, string>) =>
+    apiClient.get(`/restaurants/${restaurantId}/analytics/orders`, { params }),
+
+  getProductAnalytics: (restaurantId: string, params?: Record<string, string>) =>
+    apiClient.get(`/restaurants/${restaurantId}/analytics/products`, { params }),
+
+  getTableAnalytics: (restaurantId: string, params?: Record<string, string>) =>
+    apiClient.get(`/restaurants/${restaurantId}/analytics/tables`, { params }),
+
+  // Notifications
+  getNotifications: (restaurantId: string, params?: Record<string, string>) =>
+    apiClient.get(`/restaurants/${restaurantId}/notifications`, { params }),
+
+  getUnreadCount: (restaurantId: string) =>
+    apiClient.get(`/restaurants/${restaurantId}/notifications/unread-count`),
+
+  markNotificationRead: (restaurantId: string, notificationId: string) =>
+    apiClient.patch(`/restaurants/${restaurantId}/notifications/${notificationId}/read`),
+
+  markAllNotificationsRead: (restaurantId: string) =>
+    apiClient.patch(`/restaurants/${restaurantId}/notifications/read-all`),
 };

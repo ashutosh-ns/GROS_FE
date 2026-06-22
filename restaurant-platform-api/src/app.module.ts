@@ -14,6 +14,8 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { MenuItemsModule } from './modules/menu-items/menu-items.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { WebsocketsModule } from './websockets/websockets.module';
 import { HealthController } from './health.controller';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
@@ -50,6 +52,8 @@ import { JwtAuthGuard } from './common/guards';
     MenuItemsModule,
     OrdersModule,
     FeedbackModule,
+    AnalyticsModule,
+    NotificationsModule,
     WebsocketsModule,
   ],
   controllers: [HealthController],

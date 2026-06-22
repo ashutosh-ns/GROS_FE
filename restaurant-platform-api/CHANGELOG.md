@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] — Phase 5: Analytics & Notifications
+
+### Added
+- Analytics module with Redis-cached (5min TTL) endpoints:
+  - Revenue analytics (daily breakdown, summary totals)
+  - Order analytics (by status, peak hours, completion/cancellation rates)
+  - Product analytics (best sellers, worst performers)
+  - Table analytics (orders and revenue per table)
+- Notifications module:
+  - CRUD endpoints (list paginated, unread count, mark read, mark all read)
+  - WebSocket push on new notification
+  - Auto-creates notification on new order
+- Date range filtering (from/to query params, defaults to last 7 days)
+
 ## [0.3.0] — Phase 4: WebSocket Real-time
 
 ### Added

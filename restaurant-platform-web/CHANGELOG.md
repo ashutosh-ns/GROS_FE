@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] — Phase 5: Analytics & Notifications
+
+### Added
+- Analytics dashboard page with date range filters (Today, 7 Days, 30 Days)
+- Revenue summary cards (total revenue, orders, avg order value, tax collected)
+- Daily revenue bar chart visualization
+- Order statistics breakdown (by status, completion/cancellation rates)
+- Peak hours chart (top 8 busiest hours)
+- Best sellers table (top 10 products by quantity)
+- Table performance table (orders and revenue per table)
+- Notification bell component with unread badge count
+- Notification dropdown panel (list, mark read, mark all read)
+- Real-time notification push via WebSocket
+- Analytics and notifications API client functions
+
+### Changed
+- Dashboard layout now includes notification bell in header bar
+
 ## [0.4.0] — Phase 4: WebSocket Real-time
 
 ### Added
