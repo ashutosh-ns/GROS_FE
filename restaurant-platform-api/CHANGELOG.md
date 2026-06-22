@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — Phase 4: WebSocket Real-time
+
+### Added
+- Socket.IO WebSocket gateway with JWT authentication for staff and session-token auth for customers
+- Room management: per-restaurant and per-kitchen rooms for targeted event delivery
+- Real-time events: `order:new`, `order:status`, `bill:request`, `table:update`
+- Order service emits WebSocket events on order creation, status update, and bill request
+- Redis adapter support for horizontal scaling
+
+### Changed
+- Orders service now uses EventsGateway for real-time event emission
+
+## [0.2.0] — Phase 2: Customer Ordering
+
 ### Added
 - Initial project setup with NestJS and TypeScript
 - Docker Compose configuration (PostgreSQL, Redis, MinIO, PgAdmin, Redis Commander)

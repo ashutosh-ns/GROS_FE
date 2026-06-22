@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSessionStore } from '@/lib/stores/session-store';
+import { useCustomerSocket } from '@/lib/hooks/use-socket';
 import { formatPrice, formatTime } from '@/lib/utils';
 import type { Order, OrderStatus } from '@/types';
 
@@ -26,18 +27,9 @@ export default function OrderTrackingPage() {
   const { sessionToken, isValid } = useSessionStore();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const { socket, connected } = useCustomerSocket(sessionToken);
 
-  useEffect(() => {
-    if (!isValid()) {
-      router.push('/');
-      return;
-    }
-    fetchOrder();
-    const interval = setInterval(fetchOrder, 5000);
-    return () => clearInterval(interval);
-  }, [orderId]);
-
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
       const response = await fetch(`${API_URL}/customer/orders/${orderId}`, {
@@ -53,7 +45,36 @@ export default function OrderTrackingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId, sessionToken]);
+
+  useEffect(() => {
+    if (!isValid()) {
+      router.push('/');
+      return;
+    }
+    fetchOrder();
+  }, [orderId, isValid, router, fetchOrder]);
+
+  // WebSocket real-time status updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleStatusUpdate = (data: { orderId: string; status: OrderStatus }) => {
+      if (data.orderId === orderId) {
+        setOrder((prev) => (prev ? { ...prev, status: data.status } : null));
+      }
+    };
+
+    socket.on('order:status', handleStatusUpdate);
+    return () => { socket.off('order:status', handleStatusUpdate); };
+  }, [socket, orderId]);
+
+  // Fallback polling when WebSocket is disconnected
+  useEffect(() => {
+    if (connected) return;
+    const interval = setInterval(fetchOrder, 5000);
+    return () => clearInterval(interval);
+  }, [connected, fetchOrder]);
 
   if (loading) {
     return (
@@ -92,12 +113,15 @@ export default function OrderTrackingPage() {
             Placed at {formatTime(order.placedAt)}
           </p>
         </div>
-        <button
-          onClick={() => router.push('/menu')}
-          className="rounded-md border px-3 py-1 text-sm"
-        >
-          Order More
-        </button>
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${connected ? 'animate-pulse bg-green-500' : 'bg-yellow-500'}`} />
+          <button
+            onClick={() => router.push('/menu')}
+            className="rounded-md border px-3 py-1 text-sm"
+          >
+            Order More
+          </button>
+        </div>
       </div>
 
       {/* Status tracker */}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { restaurantsApi } from '@/lib/api/restaurants';
+import { useStaffSocket } from '@/lib/hooks/use-socket';
 import { formatPrice, formatTime } from '@/lib/utils';
 import type { Order, OrderStatus } from '@/types';
 
@@ -26,17 +27,16 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [billRequests, setBillRequests] = useState<{ tableNumber: number; sessionId: string }[]>([]);
+  const { socket, connected } = useStaffSocket(activeRestaurantId);
 
-  useEffect(() => {
-    if (activeRestaurantId) loadOrders();
-  }, [activeRestaurantId, statusFilter, page]);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
+    if (!activeRestaurantId) return;
     try {
       const params: Record<string, string> = { page: page.toString(), limit: '20' };
       if (statusFilter) params.status = statusFilter;
 
-      const res: any = await restaurantsApi.getOrders(activeRestaurantId!, params);
+      const res: any = await restaurantsApi.getOrders(activeRestaurantId, params);
       setOrders(res.data?.data || []);
       setTotalPages(res.data?.meta?.totalPages || 1);
     } catch {
@@ -44,7 +44,48 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeRestaurantId, statusFilter, page]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  // WebSocket: new orders and status updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewOrder = (order: any) => {
+      if (!statusFilter || order.status === statusFilter) {
+        setOrders((prev) => {
+          if (prev.find((o) => o.id === order.id)) return prev;
+          return [order, ...prev];
+        });
+      }
+    };
+
+    const handleStatusUpdate = (order: any) => {
+      setOrders((prev) =>
+        prev.map((o) => (o.id === order.id ? { ...o, ...order } : o)),
+      );
+      if (selectedOrder?.id === order.id) {
+        setSelectedOrder((prev) => (prev ? { ...prev, ...order } : null));
+      }
+    };
+
+    const handleBillRequest = (data: { tableNumber: number; sessionId: string }) => {
+      setBillRequests((prev) => [...prev, data]);
+    };
+
+    socket.on('order:new', handleNewOrder);
+    socket.on('order:status', handleStatusUpdate);
+    socket.on('bill:request', handleBillRequest);
+
+    return () => {
+      socket.off('order:new', handleNewOrder);
+      socket.off('order:status', handleStatusUpdate);
+      socket.off('bill:request', handleBillRequest);
+    };
+  }, [socket, statusFilter, selectedOrder?.id]);
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
@@ -69,11 +110,42 @@ export default function OrdersPage() {
     return (flow[current] as OrderStatus) || null;
   };
 
+  const dismissBillRequest = (index: number) => {
+    setBillRequests((prev) => prev.filter((_, i) => i !== index));
+  };
+
   if (loading) return <div className="p-6">Loading orders...</div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Orders</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Orders</h1>
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${connected ? 'animate-pulse bg-green-500' : 'bg-yellow-500'}`} />
+          <span className="text-xs text-muted-foreground">
+            {connected ? 'Live' : 'Offline'}
+          </span>
+        </div>
+      </div>
+
+      {/* Bill request notifications */}
+      {billRequests.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {billRequests.map((req, i) => (
+            <div key={i} className="flex items-center justify-between rounded-md border border-orange-300 bg-orange-50 p-3">
+              <span className="text-sm font-medium">
+                🧾 Table {req.tableNumber} requested the bill
+              </span>
+              <button
+                onClick={() => dismissBillRequest(i)}
+                className="rounded border px-2 py-0.5 text-xs"
+              >
+                Dismiss
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="mt-4 flex flex-wrap gap-2">

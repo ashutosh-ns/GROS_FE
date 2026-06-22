@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { restaurantsApi } from '@/lib/api/restaurants';
+import { useKitchenSocket } from '@/lib/hooks/use-socket';
 import type { Order, OrderStatus } from '@/types';
 
 const KDS_COLUMNS: { status: OrderStatus; label: string; color: string }[] = [
@@ -17,40 +18,70 @@ export default function KitchenDisplayPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const prevCountRef = useRef(0);
+  const { socket, connected } = useKitchenSocket(activeRestaurantId);
 
-  useEffect(() => {
-    if (activeRestaurantId) {
-      loadOrders();
-      const interval = setInterval(loadOrders, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [activeRestaurantId]);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
+    if (!activeRestaurantId) return;
     try {
-      // Fetch active orders only
-      const res: any = await restaurantsApi.getOrders(activeRestaurantId!, { limit: '100' });
+      const res: any = await restaurantsApi.getOrders(activeRestaurantId, { limit: '100' });
       const allOrders = res.data?.data || [];
       const activeOrders = allOrders.filter((o: Order) =>
         ['PLACED', 'ACCEPTED', 'PREPARING', 'READY'].includes(o.status),
       );
-
-      // Play sound on new order
-      if (activeOrders.length > prevCountRef.current && prevCountRef.current > 0) {
-        try {
-          const audio = new Audio('/notification.mp3');
-          audio.play().catch(() => {});
-        } catch {}
-      }
-      prevCountRef.current = activeOrders.length;
-
       setOrders(activeOrders);
+      prevCountRef.current = activeOrders.length;
     } catch {
-      // silent retry
+      // silent
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeRestaurantId]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  // WebSocket listeners
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewOrder = (order: any) => {
+      setOrders((prev) => {
+        if (prev.find((o) => o.id === order.id)) return prev;
+        return [order, ...prev];
+      });
+      // Play notification sound
+      try {
+        const audio = new Audio('/notification.mp3');
+        audio.play().catch(() => {});
+      } catch {}
+    };
+
+    const handleStatusUpdate = (order: any) => {
+      setOrders((prev) => {
+        const activeStatuses = ['PLACED', 'ACCEPTED', 'PREPARING', 'READY'];
+        if (!activeStatuses.includes(order.status)) {
+          return prev.filter((o) => o.id !== order.id);
+        }
+        return prev.map((o) => (o.id === order.id ? { ...o, ...order } : o));
+      });
+    };
+
+    socket.on('order:new', handleNewOrder);
+    socket.on('order:status', handleStatusUpdate);
+
+    return () => {
+      socket.off('order:new', handleNewOrder);
+      socket.off('order:status', handleStatusUpdate);
+    };
+  }, [socket]);
+
+  // Fallback polling (in case WebSocket disconnects)
+  useEffect(() => {
+    if (connected) return;
+    const interval = setInterval(loadOrders, 5000);
+    return () => clearInterval(interval);
+  }, [connected, loadOrders]);
 
   const handleAdvance = async (orderId: string, currentStatus: OrderStatus) => {
     const next: Record<string, string> = {
@@ -64,7 +95,15 @@ export default function KitchenDisplayPage() {
 
     try {
       await restaurantsApi.updateOrderStatus(activeRestaurantId!, orderId, nextStatus);
-      loadOrders();
+      // Optimistic update
+      setOrders((prev) => {
+        if (nextStatus === 'SERVED') {
+          return prev.filter((o) => o.id !== orderId);
+        }
+        return prev.map((o) =>
+          o.id === orderId ? { ...o, status: nextStatus as OrderStatus } : o,
+        );
+      });
     } catch {
       alert('Failed to update order');
     }
@@ -97,8 +136,10 @@ export default function KitchenDisplayPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Kitchen Display</h1>
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-          <span className="text-sm text-muted-foreground">Live (3s refresh)</span>
+          <span className={`h-2 w-2 rounded-full ${connected ? 'animate-pulse bg-green-500' : 'bg-yellow-500'}`} />
+          <span className="text-sm text-muted-foreground">
+            {connected ? 'Live (WebSocket)' : 'Polling (5s)'}
+          </span>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { EventsGateway } from '../../websockets/events.gateway';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/orders.dto';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private redis: RedisService,
+    private eventsGateway: EventsGateway,
   ) {}
 
   async createFromSession(sessionToken: string, dto: CreateOrderDto) {
@@ -143,6 +145,8 @@ export class OrdersService {
       },
     });
 
+    this.eventsGateway.emitNewOrder(restaurantId, order);
+
     return order;
   }
 
@@ -263,7 +267,7 @@ export class OrdersService {
         break;
     }
 
-    return this.prisma.order.update({
+    const updatedOrder = await this.prisma.order.update({
       where: { id: orderId },
       data: {
         status: dto.status,
@@ -280,6 +284,10 @@ export class OrdersService {
         table: { select: { number: true, name: true } },
       },
     });
+
+    this.eventsGateway.emitOrderStatusUpdate(restaurantId, updatedOrder);
+
+    return updatedOrder;
   }
 
   async requestBill(sessionToken: string) {
@@ -308,6 +316,17 @@ export class OrdersService {
     });
 
     const totalAmount = orders.reduce((sum, o) => sum + o.total, 0);
+
+    // Notify staff about bill request
+    const table = await this.prisma.table.findUnique({
+      where: { id: session.tableId },
+      select: { number: true },
+    });
+    this.eventsGateway.emitBillRequest(session.restaurantId, {
+      tableId: session.tableId,
+      tableNumber: table?.number || 0,
+      sessionId: sessionToken,
+    });
 
     return {
       orders,

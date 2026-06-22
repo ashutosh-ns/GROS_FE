@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] — Phase 4: WebSocket Real-time
+
+### Added
+- Socket.IO client with staff (JWT) and customer (session token) authentication
+- WebSocket hooks: `useStaffSocket`, `useKitchenSocket`, `useCustomerSocket`
+- Real-time order updates on Kitchen Display (replaces polling when connected)
+- Real-time order updates on Orders management page
+- Real-time order status on customer order tracking page
+- Bill request notifications on orders page (WebSocket push)
+- Connection status indicators on KDS, orders, and order tracking pages
+- Automatic fallback to polling when WebSocket disconnects
+
+### Changed
+- Kitchen Display now uses WebSocket as primary, polling as fallback
+- Customer order tracking uses WebSocket for instant status updates
+- Orders page shows live bill request notifications from customers
+
 ## [0.3.0] — Phase 3: Restaurant Dashboard
 
 ### Added
