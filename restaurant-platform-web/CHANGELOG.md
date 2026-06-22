@@ -7,22 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — Phase 3: Restaurant Dashboard
+
 ### Added
-- Initial project setup with Next.js 14 (App Router) and TypeScript
-- TailwindCSS and shadcn/ui configuration
-- Project structure with route groups: (customer), (dashboard), (admin)
-- TanStack Query provider setup
-- Zustand store skeleton (auth, cart)
-- API client with axios (interceptors for auth, error handling)
-- Socket.IO client configuration
-- Authentication pages (login, register)
-- Protected route middleware
-- Dashboard layout (sidebar, header, content area)
-- Role-based navigation
-- Customer app base layout (mobile-first)
-- Environment configuration
-- ESLint and Prettier configuration
-- Base UI components from shadcn/ui
+- Dashboard overview page with real-time stats (today's orders, revenue, active tables, pending orders)
+- Menu management page: categories CRUD, menu items table with availability toggle, add/edit item modal with variants & add-ons
+- Orders management page: status filters, pagination, order detail modal, status advancement, cancel order
+- Kitchen Display System (KDS): 4-column board (New/Accepted/Preparing/Ready), 3s auto-refresh, time-based color coding, one-tap status advancement, new order notification sound
+- Tables management page: grid layout, CRUD, capacity, active/inactive toggle
+- QR Codes page: generate all QR codes, copy URL, regenerate individual
+- Members page: invite by email, assign roles, update roles, remove members
+- Settings page: restaurant name, description, contact info, address, GST, tax rate, operating hours
+- Dashboard API client (`restaurants.ts`): all restaurant management endpoints
 
 ## [0.2.0] — Phase 2: Customer Ordering
 
