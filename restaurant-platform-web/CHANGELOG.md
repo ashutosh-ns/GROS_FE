@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] — Phase 9: Production Deployment
+
+### Added
+- Production Dockerfile (multi-stage Next.js build, Alpine)
+- Production deployment ready (Docker Compose + Nginx reverse proxy)
+
 ## [0.8.0] — Phase 8: Security Hardening & Testing
 
 ### Added

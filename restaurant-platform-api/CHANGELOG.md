@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] — Phase 9: Production Deployment
+
+### Added
+- Production Dockerfile (multi-stage, Alpine-based, health check)
+- Production docker-compose with Nginx, PostgreSQL, Redis
+- Nginx config with rate limiting, WebSocket proxy, HTTPS-ready
+- GitHub Actions CI workflow (lint, type-check, test, build for both repos)
+- GitHub Actions deploy workflow (SSH to VPS, pull, build, migrate)
+- Production .env template with all required variables
+- Database backup script (daily cron, 7-day retention)
+
 ## [0.7.0] — Phase 8: Security Hardening & Testing
 
 ### Added
