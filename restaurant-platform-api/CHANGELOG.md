@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] — Phase 8: Security Hardening & Testing
+
+### Added
+- SECURITY.md with threat model, security controls documentation, and checklist
+- Security middleware (cache control, permissions policy, referrer policy, header stripping)
+- Integration tests: auth flow (register, login, lockout, refresh rotation)
+- Integration tests: tenant isolation (cross-tenant access prevention)
+- Integration tests: order flow (RBAC, status transitions)
+
 ## [0.6.0] — Phase 7: Subscriptions & Billing
 
 ### Added

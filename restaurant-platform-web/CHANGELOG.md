@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] — Phase 8: Security Hardening & Testing
+
+### Added
+- Playwright configuration with Chrome + Mobile Chrome projects
+- E2E tests: authentication flow (login, register, logout, redirect protection)
+- E2E tests: customer ordering flow (QR scan, menu, cart, order)
+- E2E tests: dashboard navigation (all pages, role-based access)
+- Auto-starts dev server for E2E tests
+
 ## [0.7.0] — Phase 7: Subscriptions & Billing
 
 ### Added
