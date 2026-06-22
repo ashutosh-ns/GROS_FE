@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] — Phase 6: Super Admin
+
+### Added
+- Admin layout with separate navigation (Overview, Restaurants, Users, Audit Logs)
+- Platform role guard (SUPER_ADMIN/PLATFORM_ADMIN only)
+- Admin overview page with platform KPI cards and health metrics
+- Restaurants management: searchable table with stats, plan, activate/deactivate, impersonate
+- Users management: searchable table with role badges, membership counts, enable/disable
+- Audit logs page: filterable by entity and action, paginated
+- Admin API client (`admin.ts`)
+- Link to restaurant dashboard from admin sidebar
+
 ## [0.5.0] — Phase 5: Analytics & Notifications
 
 ### Added

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] — Phase 6: Super Admin
+
+### Added
+- Admin module with SUPER_ADMIN/PLATFORM_ADMIN guard
+- Platform stats endpoint (restaurants, users, orders, revenue totals)
+- List all restaurants with search, filters, pagination, subscription info
+- Restaurant detail with members, stats, revenue
+- Activate/deactivate restaurant toggle
+- Impersonation: generates temporary JWT for restaurant owner
+- User management: list with search, activate/deactivate
+- Audit logs endpoint with entity/action/user filtering
+
 ## [0.4.0] — Phase 5: Analytics & Notifications
 
 ### Added

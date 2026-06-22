@@ -16,6 +16,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { WebsocketsModule } from './websockets/websockets.module';
 import { HealthController } from './health.controller';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
@@ -54,6 +55,7 @@ import { JwtAuthGuard } from './common/guards';
     FeedbackModule,
     AnalyticsModule,
     NotificationsModule,
+    AdminModule,
     WebsocketsModule,
   ],
   controllers: [HealthController],
