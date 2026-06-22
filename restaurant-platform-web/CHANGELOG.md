@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] — Phase 7: Subscriptions & Billing
+
+### Added
+- Billing page: current subscription status, plan details, trial info
+- Plans display with pricing, features, table/staff limits
+- Subscribe (free trial), change plan, cancel subscription flows
+- Razorpay checkout integration (opens Razorpay modal for payment)
+- Payment confirmation flow with backend verification
+- Invoices table (date, plan, amount, tax, total, status)
+- Subscription status badges (Active, Trialing, Past Due, Cancelled)
+- Billing link in dashboard sidebar navigation
+
 ## [0.6.0] — Phase 6: Super Admin
 
 ### Added

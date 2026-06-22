@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] — Phase 7: Subscriptions & Billing
+
+### Added
+- Subscriptions module with Razorpay integration skeleton
+- Plans endpoint (public, lists all active plans)
+- Subscription CRUD: create with 14-day trial, change plan, cancel
+- Razorpay order creation endpoint (returns order ID + amount for checkout)
+- Payment success handler: verifies payment, activates subscription, creates invoice
+- Invoices endpoint (list for restaurant)
+- 18% GST auto-calculation on invoices
+
 ## [0.5.0] — Phase 6: Super Admin
 
 ### Added

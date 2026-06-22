@@ -103,4 +103,28 @@ export const restaurantsApi = {
 
   markAllNotificationsRead: (restaurantId: string) =>
     apiClient.patch(`/restaurants/${restaurantId}/notifications/read-all`),
+
+  // Subscriptions & Billing
+  getPlans: () => apiClient.get('/plans'),
+
+  getSubscription: (restaurantId: string) =>
+    apiClient.get(`/restaurants/${restaurantId}/subscription`),
+
+  createSubscription: (restaurantId: string, planId: string) =>
+    apiClient.post(`/restaurants/${restaurantId}/subscription`, { planId }),
+
+  changePlan: (restaurantId: string, planId: string) =>
+    apiClient.patch(`/restaurants/${restaurantId}/subscription/change-plan`, { planId }),
+
+  cancelSubscription: (restaurantId: string) =>
+    apiClient.patch(`/restaurants/${restaurantId}/subscription/cancel`),
+
+  createRazorpayOrder: (restaurantId: string) =>
+    apiClient.post(`/restaurants/${restaurantId}/subscription/create-order`),
+
+  confirmPayment: (restaurantId: string, data: { razorpayPaymentId: string; razorpayOrderId: string; razorpaySignature: string }) =>
+    apiClient.post(`/restaurants/${restaurantId}/subscription/payment-success`, data),
+
+  getInvoices: (restaurantId: string) =>
+    apiClient.get(`/restaurants/${restaurantId}/invoices`),
 };
